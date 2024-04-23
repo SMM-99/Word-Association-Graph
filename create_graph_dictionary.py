@@ -13,13 +13,27 @@ def separar_oraciones(texto):
     return [nlp(line) for line in texto.splitlines()]
 
 
-def obtener_palabras_relevantes(oracion):
-    doc = nlp(oracion)
+def obtener_palabras_relevantes(linea):
+    linea = linea.lower()
+    linea_sep = linea.split("  ")  # La primera palabra está separada por dos espacios
+    palabra_1 = linea_sep[0]  # Primera palabra
+
+    if len(linea_sep) == 1:
+        return []
+
+    # Procesamiento línea
+    linea_pro = re.sub("[\(\[].*?[\)\]]", " ", linea_sep[1])
+    linea_pro = re.sub("(\ n.\ )|(\ adj.\ )|(\ v. \ )", " ", linea_pro)
+    linea_pro = re.sub("\d+", "", linea_pro)
+
+    doc = nlp(linea_pro)
     palabras_relevantes = []
+
     for token in doc:
         if token.pos_ in ['NOUN', 'ADJ']:
             palabras_relevantes.append(token.lemma_)
-    return palabras_relevantes
+
+    return [palabra_1] + palabras_relevantes
 
 
 def escribir_grafo(G, filename):
@@ -28,31 +42,31 @@ def escribir_grafo(G, filename):
     # Escribe el grafo en formato Pajek NET
     nx.write_pajek(G, filename + ".net")
 
-
-#def procesar_linea(linea):
-
-
-def obtener_palabras_relevantes(oracion):
-    oracion = oracion.lower()
-    oracion = re.sub("[\(\[].*?[\)\]]", "", oracion)
-    doc = nlp(oracion)
-    palabras_relevantes = []
-    for token in doc:
-        if token.pos_ in ['NOUN', 'ADJ']:
-            palabras_relevantes.append(token.lemma_)
-    return palabras_relevantes
-
-
 if __name__ == "__main__":
     # Carga el modelo de lenguaje en inglés de spaCy
     nlp = spacy.load("en_core_web_sm")
 
     archivo_txt = "Oxford English Dictionary.txt"
     contenido_txt = leer_archivo(archivo_txt)
-    contenido_txt_1 = contenido_txt[0:1000]
-    #oraciones = separar_oraciones(contenido_txt[0:100])
 
-    for oracion in  contenido_txt_1.splitlines():
-        print(obtener_palabras_relevantes(oracion))
+    G = nx.Graph()
 
-    #print(oraciones_txt[0:5])
+    for linea in contenido_txt.splitlines():
+        palabras_relevantes = obtener_palabras_relevantes(linea)
+        for i, word in enumerate(palabras_relevantes):
+            G.add_node(word)
+            for other_word in palabras_relevantes[i + 1:]:
+                if G.has_edge(word, other_word):
+                    # Incrementar el peso del borde si ya existe
+                    G[word][other_word]['weight'] += 1
+                else:
+                    # Agregar el borde con peso 1 si no existe
+                    G.add_edge(word, other_word, weight=1)
+            # Incrementar la cuenta de apariciones de la palabra
+            if 'count' in G.nodes[word]:
+                G.nodes[word]['count'] += 1
+            else:
+                G.nodes[word]['count'] = 1
+
+    escribir_grafo(G, "Oxford_Dict_Graph")
+
