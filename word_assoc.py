@@ -13,10 +13,12 @@ def dibuja_distr_grado(G):
     plt.grid()
     # plt.show()
 
+# https://github.com/sujithps/Dictionary/tree/master
+
 if __name__ == "__main__":
     # Lectura de grafos
     G_EAT = nx.read_pajek("Redes/EATnew_undir.net")
-    G_Alc = nx.read_gml("./Alchemist_final.gml")
+    G_Alc = nx.read_gml("Redes/Alchemist_final.gml")
 
     # Palabras en cada grafo
     words_Alc = set(G_Alc.nodes)
@@ -38,6 +40,7 @@ if __name__ == "__main__":
     H_EAT = G_EAT.subgraph(words_up)
     H_Alc = G_Alc.subgraph(words)
 
+    nx.write_gml(H_EAT,  "EAT_subgraph_Alc.gml")
     # Dibuja distribución de grafos
     plt.figure(1)
     plt.subplot(121)
