@@ -30,10 +30,15 @@ def obtener_palabras_relevantes(linea):
     palabras_relevantes = []
 
     for token in doc:
-        if token.pos_ in ['NOUN', 'ADJ']:
+        if token.pos_ in ['ADJ']:
             palabras_relevantes.append(token.lemma_)
-
-    return [palabra_1] + palabras_relevantes
+    doc_1 = nlp(palabra_1)
+    if len(doc_1) > 0:
+        token_palabra_1 = doc[0]
+        if token_palabra_1.pos_ == 'ADJ':
+            palabras_relevantes.append(token_palabra_1.lemma_)
+    return palabras_relevantes
+    #return [palabra_1] + palabras_relevantes
 
 
 def escribir_grafo(G, filename):
@@ -46,7 +51,7 @@ if __name__ == "__main__":
     # Carga el modelo de lenguaje en inglés de spaCy
     nlp = spacy.load("en_core_web_sm")
 
-    archivo_txt = "Oxford English Dictionary.txt"
+    archivo_txt = "Textos/Oxford English Dictionary.txt"
     contenido_txt = leer_archivo(archivo_txt)
 
     G = nx.Graph()
@@ -68,5 +73,5 @@ if __name__ == "__main__":
             else:
                 G.nodes[word]['count'] = 1
 
-    escribir_grafo(G, "Oxford_Dict_Graph")
+    escribir_grafo(G, "Oxford_Dict_Graph_Adj")
 
