@@ -12,6 +12,8 @@ def leer_archivo(nombre_archivo):
 def separar_oraciones(texto):
     return [nlp(line) for line in texto.splitlines()]
 
+def lectura_adjectivos(linea):
+
 
 def obtener_palabras_relevantes(linea):
     linea = linea.lower()
