@@ -13,6 +13,7 @@ def separar_oraciones(texto):
     return [nlp(line) for line in texto.splitlines()]
 
 def lectura_adjectivos(linea):
+    linea = linea.lower()
 
 
 def obtener_palabras_relevantes(linea):
@@ -39,8 +40,8 @@ def obtener_palabras_relevantes(linea):
         token_palabra_1 = doc[0]
         if token_palabra_1.pos_ == 'ADJ':
             palabras_relevantes.append(token_palabra_1.lemma_)
-    return palabras_relevantes
-    #return [palabra_1] + palabras_relevantes
+    #return palabras_relevantes
+    return [palabra_1] + palabras_relevantes
 
 
 def escribir_grafo(G, filename):
